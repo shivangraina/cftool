@@ -1,10 +1,22 @@
 package test
 
-import ("fmt"
+import (
+	"fmt"
 
+	"github.com/docopt/docopt-go"
 )
-func Testing()( string){
-	var  a string 
-	a=fmt.Sprintf("Hello")
-	return a
+func Testing()(){
+	usage := `tool
+
+Usage:
+  
+  tool -h | --help
+ 
+
+Options:
+  -h --help     Show this screen.`
+
+	  arguments, _ := docopt.ParseDoc(usage)
+	  fmt.Println(arguments)
+
 }
