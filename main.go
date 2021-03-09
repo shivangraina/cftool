@@ -2,113 +2,79 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
-//BaseURL ..
-var BaseURL string = "https://codeforces.com/api" 
 
-//Results ..
-type Results struct {
-	Result []Result `json:"result"`
-}
-//Result ..
-type Result struct {
-	ID              int64   `json:"id"`
-	ContestID       int64   `json:"contestId"`
-	Problem         Problem `json:"problem"`
-	ProgrammingLang string  `json:"programmingLanguage"`
-	Verdict         string  `json:"verdict"`
-	Author          Author  `json:"author"`
-}
-// Problem ..
-type Problem struct {
-	Index  string   `json:"index"`
-	Name   string   `json:"name"`
-	Tags   []string `json:"tags"`
-	Rating int64    `json:"rating"`
-}
-//Author ..
-type Author struct {
-	ParticipantType string `json:"participantType"`
+//BaseURL ..
+var BaseURL string = "https://codeforces.com"
+
+// create an Http Client
+var client http.Client
+
+//GetUserSubmissions .. Fetches Submission in batches of count
+func GetUserSubmissions(userhandle string, from, count int) ([]Submission, error) {
+	var submissions []Submission
+	url := fmt.Sprintf(BaseURL+"/api/user.status?handle=%s&from=%s&count=%s", userhandle, fmt.Sprint(from), fmt.Sprint(count))
+	fmt.Println(url)
+	var wrapper Results
+	FetchJSON(url, &wrapper)
+	if len(wrapper.Result) == 0 {
+		return submissions, errors.New("Empty List")
+
+	}
+	for _, submission := range wrapper.Result {
+		subURL := fmt.Sprintf(BaseURL+"/contest/%s/submission/%s", fmt.Sprint(submission.ContestID), fmt.Sprint(submission.ID))
+		sub := Submission{
+			ContestID:     submission.ContestID,
+			ProblemIndex:  submission.Problem.Index,
+			ProblemName:   submission.Problem.Name,
+			Verdict:       submission.Verdict,
+			Language:      submission.ProgrammingLang,
+			ProblemRating: submission.Problem.Rating,
+			Tags:          submission.Problem.Tags,
+			SubmissionID:  submission.ID,
+			SubmissionURL: subURL,
+		}
+		submissions = append(submissions, sub)
+	}
+	return submissions, nil
+
 }
 
 func main() {
+	start := 1
+	for {
 
-	fmt.Println(PlayedContests())
-
-}
-//FetchContestData ..
-func FetchContestData(jobs <-chan int64, results chan<- Results) {
-	var Handle string = "RemoteCodeExecution" //take from cmd
-	var wrapper Results
-
-	for contestid := range jobs {
-
-		url := fmt.Sprintf(BaseURL+"/contest.status?contestId=%d&handle=%s&from=1&count=50", contestid, Handle)
-		fmt.Println(url)
-
-		FetchJSON(url, &wrapper)
-		results <- wrapper
-
-	}
-
-}
-//GetAllContests ..
-func GetAllContests() []int64 {
-	var wrapper Results
-	var contestids []int64
-	url := fmt.Sprintf(BaseURL + "/contest.list")
-	
-
-	FetchJSON(url, &wrapper)
-	for _, result := range wrapper.Result {
-		contestids = append(contestids, result.ID)
-
-	}
-	return contestids
-
-}
-//PlayedContests ..
-func PlayedContests() []int64 {
-
-	contestids := GetAllContests()
-
-	var played []int64
-	jobs := make(chan int64, 100)
-	results := make(chan Results, 100)
-	for i := 0; i <= 1000; i++ {
-		go FetchContestData(jobs, results)
-	}
-	for _, contestid := range contestids {
-		jobs <- contestid
-
-	}
-	close(jobs)
-	for _ = range jobs {
-		wrapper := <-results
-		for _, submission := range wrapper.Result {
-			fmt.Println(submission)
-			if submission.Author.ParticipantType == "CONTESTANT" {
-				played = append(played, submission.ContestID)
-				break
-
-			}
+		submission, err := GetUserSubmissions("Siddhant1", start*50+1, 50)
+		fmt.Println(submission)
+		if err != nil {
+			break
 		}
-
+		start++
 	}
-	return played
 }
+
 //FetchJSON ..
 func FetchJSON(url string, wrapper interface{}) error {
-	res, err := http.Get(url)
+	res, err := client.Get(url)
 	if err != nil {
-        fmt.Println(err)
+		log.Println(err)
 		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		log.Println(res)
+		return errors.New(fmt.Sprint(res))
+
 	}
 	defer res.Body.Close()
 
 	dec := json.NewDecoder(res.Body)
-	return dec.Decode(&wrapper)
+
+	dec.Decode(&wrapper)
+	//fmt.Print(wrapper)
+	return err
 
 }
