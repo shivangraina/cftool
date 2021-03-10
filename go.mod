@@ -3,6 +3,7 @@ module github.com/shivangraina/tool
 go 1.13
 
 require (
+	github.com/PuerkitoBio/goquery v1.6.1 // indirect
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect

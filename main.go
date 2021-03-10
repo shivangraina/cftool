@@ -26,7 +26,7 @@ func GetUserSubmissions(userhandle string, from, count int) ([]Submission, error
 
 	}
 	for _, submission := range wrapper.Result {
-		subURL := fmt.Sprintf(BaseURL+"/contest/%s/submission/%s", fmt.Sprint(submission.ContestID), fmt.Sprint(submission.ID))
+		subURL := fmt.Sprintf(BaseURL+"/contest/%s/submission/%s", fmt.Sprint(submission.ContestID), fmt.Sprint(submission.ID)
 		sub := Submission{
 			ContestID:     submission.ContestID,
 			ProblemIndex:  submission.Problem.Index,
@@ -41,6 +41,8 @@ func GetUserSubmissions(userhandle string, from, count int) ([]Submission, error
 		submissions = append(submissions, sub)
 	}
 	return submissions, nil
+
+}
 
 }
 
