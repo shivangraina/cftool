@@ -7,18 +7,17 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 //GetUserCode ..
-func GetUserCode(SubData FetchCode, CodeReciever chan UserCodeData, wg *sync.WaitGroup, m *sync.Mutex, client1 *http.Client) (string, error) {
+func GetUserCode(SubData FetchCode, CodeReciever chan UserCodeData, wg *sync.WaitGroup) (string, error) {
 
 	// Make HTTP request
 	defer wg.Done()
-	m.Lock()
-	response, err := client1.Get(SubData.SubmissionURL)
+
+	response, err := http.Get(SubData.SubmissionURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,23 +35,15 @@ func GetUserCode(SubData FetchCode, CodeReciever chan UserCodeData, wg *sync.Wai
 		fmt.Errorf("Error loading HTTP response body. ", err)
 
 	}
-
+	fmt.Println("Fetching Code for problem ", SubData.ContestID, SubData.ProblemIndex)
 	code := document.Find("#program-source-text").First().Text()
-	if code == "" {
-		time.Sleep(5 * time.Second)
-		fmt.Println("SLEEPING")
-	}
 
-	fmt.Println(code, SubData.SubmissionURL)
-
-	//bodystring := string(body)
-	//fmt.Println(bodystring,"BOOOOOOOTY",response.StatusCode)
 	var DataWithCode UserCodeData
 	DataWithCode.ContestID = SubData.ContestID
 	DataWithCode.ProblemIndex = SubData.ProblemIndex
 	DataWithCode.ProblemCode = code
 	DataWithCode.Language = SubData.Language
-	m.Unlock()
+
 	CodeReciever <- DataWithCode
 
 	return code, nil

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,7 +12,6 @@ import (
 
 //baseURL ..
 var baseURL string = "https://codeforces.com"
-var client1 http.Client
 
 //GetUserSubmissions .. Fetches Submission in batches of count
 func GetUserSubmissions(userHandle string, from, count int) ([]Submission, error) {
@@ -62,11 +62,18 @@ type FetchCode struct {
 func main() {
 	PageIndex := 1
 	length := 100
-	CfUsername := "RemoteCodeExecution"
+	var CfUsername, reponame, owner string
+
+	flag.StringVar(&CfUsername, "h", "", "provide your cf handle")
+	flag.StringVar(&owner, "g", "", "provide your github username")
+	flag.StringVar(&reponame, "n", "", "provide the name of repo to be created")
+
+	flag.Parse()
+	
+
 	CodeReciever := make(chan UserCodeData, length)
 
 	var wg sync.WaitGroup
-	var m sync.Mutex
 	for {
 
 		submission, err := GetUserSubmissions(CfUsername, PageIndex*length+1, length)
@@ -75,7 +82,9 @@ func main() {
 			break
 		}
 		for _, sub := range submission {
-
+			if sub.Verdict != "OK" {
+				continue
+			}
 			var data FetchCode
 			data.ContestID = sub.ContestID
 			data.ProblemIndex = sub.ProblemIndex
@@ -83,7 +92,7 @@ func main() {
 			data.Language = sub.Language
 
 			wg.Add(1)
-			go GetUserCode(data, CodeReciever, &wg, &m, &client1)
+			go GetUserCode(data, CodeReciever, &wg)
 		}
 		PageIndex++
 	}
@@ -93,15 +102,14 @@ func main() {
 		close(CodeReciever)
 	}()
 	client := GetClientWithToken()
-	owner := "shivangraina"
-	reponame := "TestingTest"
+
 	CreateEmptyRepositry(client, reponame)
 	for code := range CodeReciever {
-		go func(){
-		fmt.Println(code)
-		CreateContestFiles(client, code, reponame, owner)
+	
 
-		}()
+			CreateContestFiles(client, code, reponame, owner)
+
+		
 	}
 
 }

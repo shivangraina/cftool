@@ -6,6 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.1 // indirect
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
 	github.com/fatih/color v1.10.0 // indirect
+	github.com/gocolly/colly/v2 v2.1.0 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/nmrshll/oauth2-noserver v0.0.0-20190221200101-9bf017bef639 // indirect
 	github.com/nmrshll/rndm-go v0.0.0-20170430161430-8da3024e53de // indirect
