@@ -106,7 +106,7 @@ func main() {
 	CreateEmptyRepositry(client, reponame)
 	for code := range CodeReciever {
 	
-
+             fmt.Println("Creating file for",code.ContestID,code.ProblemIndex)
 			CreateContestFiles(client, code, reponame, owner)
 
 		
