@@ -11,9 +11,6 @@ If you have Go installed and configured (i.e. with `$GOPATH/bin` in your `$PATH`
 go get -u github.com/shivangraina/cftool
 ```
 
-Otherwise [download a release for your platform](https://github.com/tomnomnom/assetfinder/releases).
-To make it easier to execute you can put the binary in your `$PATH`.
-
 ## Usage
 
 ```
