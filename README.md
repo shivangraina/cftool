@@ -14,7 +14,7 @@ go get -u github.com/shivangraina/cftool
 ## Usage
 
 ```
-cftool [-c] [cfUsername] [-g] [githubUsername] [-n] [repositoryName]
+cftool [-c] [cfUsername] [-g] [githubUsername] [-n] [Newrepository]
 ```
 
 ## Example
