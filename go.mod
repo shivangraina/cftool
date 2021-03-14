@@ -1,4 +1,4 @@
-module github.com/shivangraina/tool
+module github.com/shivangraina/cftool
 
 go 1.13
 
