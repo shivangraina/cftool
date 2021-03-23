@@ -32,7 +32,7 @@ func GetUserCode(SubData FetchCode, CodeReciever chan UserCodeData, wg *sync.Wai
 	// Create a goquery document from the HTTP response
 	document, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
-		fmt.Errorf("Error loading HTTP response body. ", err)
+		fmt.Errorf("Error loading HTTP response Body. ", err)
 
 	}
 	fmt.Println("Fetching Code for problem ", SubData.ContestID, SubData.ProblemIndex)
