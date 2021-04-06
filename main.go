@@ -70,8 +70,7 @@ func main() {
 	flag.StringVar(&reponame, "n", "", "provide the name of repo to be created")
 
 	flag.Parse()
-	
-	if flag.NArg() == 0 { 
+	if CfUsername=="" || owner==""||reponame=="" { 
     flag.Usage()
     os.Exit(1)
 }
