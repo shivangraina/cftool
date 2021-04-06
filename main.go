@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -70,6 +71,11 @@ func main() {
 
 	flag.Parse()
 	
+	if flag.NArg() == 0 { 
+    flag.Usage()
+    os.Exit(1)
+}
+
 
 	CodeReciever := make(chan UserCodeData, length)
 
